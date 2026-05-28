@@ -6,7 +6,11 @@
 
 Standard LLM-based user simulators condition on a static user profile, ignoring how real users shift between different decision modes over time. This project introduces a **hybrid profile** that pairs a long-term genre distribution with a dynamically predicted *intent* signal — injected into the LLM prompt alongside quantitative evidence (profile similarity, recent similarity, drift) — to make simulated click decisions more faithful to observed behaviour.
 
-### Intent Taxonomy
+![IntentAwareRecSim Framework](figure/IntentAwareRecSim.png)
+
+---
+
+## Intent Taxonomy
 
 | Intent | When | LLM Behaviour |
 |---|---|---|
@@ -14,7 +18,9 @@ Standard LLM-based user simulators condition on a static user profile, ignoring 
 | `follow_recent` | High drift — recent taste has diverged from long-term profile | Prefer items matching the recent interaction window |
 | `explore` | Novelty-seeking — target not represented in either profile | Prefer items from genres underrepresented in both |
 
-### Pipeline
+---
+
+## Pipeline
 
 ```
 Raw interactions
@@ -47,7 +53,7 @@ Raw interactions
 ## Project Structure
 
 ```
-HybridProfileSimulation/
+IntRecSim_CIKM/
 ├── config/
 │   ├── config_general.yaml          # Dataset paths, LLM settings
 │   ├── prompt.yaml                  # LLM prompt templates
@@ -64,12 +70,13 @@ HybridProfileSimulation/
 │   ├── LightTransformer.py          # Lightweight Transformer
 │   ├── intent_models.py             # Model registry and dataset class
 │   └── intent_predictor.py          # Inference wrapper
-├── analysis/                        # Visualisation and ablation scripts
+├── figure/
+│   └── IntentAwareRecSim.pdf        # Framework overview figure
+├── utils/                           # Shared utilities
 ├── intent_m_train.py                # Intent model training entry point
-├── intent_predict.py                # Batch inference on any NPZ split
+├── intent_m_train_soft.py           # Soft-label variant training
 ├── discrimination_evaluation_parallel.py   # LLM discrimination evaluation
-├── ranking_evaluation_parallel.py          # LLM ranking evaluation (NDCG@K)
-└── experiments.ipynb                # Interactive experiment notebook
+└── ranking_evaluation_parallel.py          # LLM ranking evaluation (NDCG@K)
 ```
 
 ---
@@ -81,7 +88,7 @@ Experiments run on three public benchmarks:
 | Dataset | Domain |
 |---|---|
 | [MovieLens-1M](https://grouplens.org/datasets/movielens/1m/) | Movies |
-| [Amazon Book](https://amazon-reviews-2023.github.io/)) | Books |
+| [Amazon Book](https://amazon-reviews-2023.github.io/) | Books |
 | [Amazon Beauty](https://amazon-reviews-2023.github.io/) | Cosmetics |
 
 ---
@@ -129,13 +136,13 @@ Checkpoints are saved to `output/.../ckpt_YYYYMMDD_HHMM/` containing `best_inten
 ```bash
 # Profile-only baseline
 python discrimination_evaluation_parallel.py \
-    --data-dir output/state_transition/ml_1m/intent_data/<run_dir> \
+    --data-dir output/state_transition/ml_1m/intent_data/<run_dir>
 
 # Intent-aware (predicted intent, confidence threshold 0.6)
 python discrimination_evaluation_parallel.py \
     --data-dir output/state_transition/ml_1m/intent_data/<run_dir> \
     --prompt-mode intent_specific \
-    --ckpt output/state_transition/ml_1m/gru/ckpt_<TIMESTAMP> \
+    --ckpt output/state_transition/ml_1m/gru/ckpt_<TIMESTAMP>
 ```
 
 ### 4. Ranking evaluation
@@ -173,4 +180,3 @@ Edit `config/config_general.yaml` to set dataset paths and the LLM backend. Both
 | `llm` | LLM identifier, e.g. `azure:gpt-4o-mini` or `gpt-4o` |
 | `temperature` | Sampling temperature (default `0.1`) |
 | `seed` | Global random seed |
-
