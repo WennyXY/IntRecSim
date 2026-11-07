@@ -4,7 +4,7 @@
 
 ## Overview
 
-Standard LLM-based user simulators condition on a static user profile, ignoring how real users shift between different decision modes over time. This project introduces a **hybrid profile** that pairs a long-term genre distribution with a dynamically predicted *intent* signal — injected into the LLM prompt alongside quantitative evidence (profile similarity, recent similarity, drift) — to make simulated click decisions more faithful to observed behaviour.
+Standard LLM-based user simulators condition on a static user profile, ignoring how real users shift between different decision modes over time. This project introduces a **hybrid profile** that pairs a long-term genre distribution with a dynamically predicted *intent* signal, injected into the LLM prompt alongside quantitative evidence (profile similarity, recent similarity, drift), to make simulated behaviour more faithful to observed behaviour.
 
 ![IntentAwareRecSim Framework](figure/IntentAwareRecSim.png)
 
